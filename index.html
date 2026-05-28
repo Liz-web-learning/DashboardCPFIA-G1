@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Tutoría INFOTEC CLF-C02</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #f5f7fa;
+  --bg2: #ffffff;
+  --bg3: #eef1f6;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.15);
+  --text: #111827;
+  --text2: #4b5563;
+  --text3: #9ca3af;
+  --blue: #3b82f6;
+  --blue2: #60a5fa;
+  --green: #10b981;
+  --green2: #34d399;
+  --purple: #8b5cf6;
+  --purple2: #a78bfa;
+  --amber: #f59e0b;
+  --amber2: #fbbf24;
+  --red: #ef4444;
+  --red2: #f87171;
+  --teal: #14b8a6;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* GRID BG */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wrapper { max-width: 1200px; margin: 0 auto; padding: 32px 20px 60px; position: relative; z-index: 1; }
+
+/* HEADER */
+.header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 36px; gap: 20px; flex-wrap: wrap; }
+.header-left {}
+.header-tag { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--blue); letter-spacing: .15em; text-transform: uppercase; margin-bottom: 8px; }
+.header-title { font-size: clamp(24px, 4vw, 36px); font-weight: 700; color: var(--text); line-height: 1.1; letter-spacing: -.02em; }
+.header-title span { color: var(--blue); }
+.header-sub { font-size: 13px; color: var(--text2); margin-top: 6px; }
+.refresh-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--bg2); border: 1px solid var(--border2); border-radius: 10px; padding: 10px 18px; font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer; font-family: 'Space Grotesk', sans-serif; transition: all .2s; white-space: nowrap; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+.refresh-btn:hover { border-color: var(--blue); color: var(--blue2); }
+.refresh-btn.loading { opacity: .6; pointer-events: none; }
+.last-update { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text3); margin-top: 6px; text-align: right; }
+
+/* STAT CARDS */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 20px; position: relative; overflow: hidden; transition: border-color .2s; box-shadow: 0 1px 8px rgba(0,0,0,.05); }
+.stat-card:hover { border-color: var(--border2); }
+.stat-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+.stat-card.blue::after  { background: var(--blue); }
+.stat-card.green::after { background: var(--green); }
+.stat-card.purple::after { background: var(--purple); }
+.stat-card.amber::after { background: var(--amber); }
+.stat-card.red::after   { background: var(--red); }
+.stat-card.teal::after  { background: var(--teal); }
+.stat-icon { font-size: 22px; margin-bottom: 10px; }
+.stat-n { font-size: 36px; font-weight: 700; letter-spacing: -.03em; line-height: 1; margin-bottom: 4px; }
+.stat-card.blue   .stat-n { color: var(--blue2); }
+.stat-card.green  .stat-n { color: var(--green2); }
+.stat-card.purple .stat-n { color: var(--purple2); }
+.stat-card.amber  .stat-n { color: var(--amber2); }
+.stat-card.red    .stat-n { color: var(--red2); }
+.stat-card.teal   .stat-n { color: var(--teal); }
+.stat-label { font-size: 12px; color: var(--text2); font-weight: 500; text-transform: uppercase; letter-spacing: .06em; }
+
+/* PANELS */
+.panels-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.panel-full { grid-column: 1 / -1; }
+.panel { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 22px; box-shadow: 0 1px 10px rgba(0,0,0,.05); }
+.panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.panel-title { font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: .04em; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+.panel-dot { width: 8px; height: 8px; border-radius: 50%; }
+.dot-blue   { background: var(--blue); box-shadow: 0 0 6px rgba(59,130,246,.4); }
+.dot-green  { background: var(--green); box-shadow: 0 0 6px rgba(16,185,129,.4); }
+.dot-purple { background: var(--purple); box-shadow: 0 0 6px rgba(139,92,246,.4); }
+.dot-amber  { background: var(--amber); box-shadow: 0 0 6px rgba(245,158,11,.4); }
+.dot-teal   { background: var(--teal); box-shadow: 0 0 6px rgba(20,184,166,.4); }
+.panel-badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text3); }
+canvas { max-height: 220px; }
+
+/* TABLE */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th { font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+.data-table td { font-size: 13px; color: var(--text2); padding: 10px 12px; border-bottom: 1px solid var(--border); font-family: 'Space Grotesk', sans-serif; }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: rgba(0,0,0,.02); color: var(--text); }
+
+/* PROGRESS BAR */
+.prog-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.prog-row:last-child { margin-bottom: 0; }
+.prog-label { font-size: 12px; color: var(--text2); width: 130px; flex-shrink: 0; }
+.prog-track { flex: 1; height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 3px; transition: width .8s ease; }
+.prog-val { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text3); width: 44px; text-align: right; flex-shrink: 0; }
+
+/* BADGE PUNTAJE */
+.score-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 52px; padding: 3px 10px; border-radius: 20px; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500; }
+.score-high  { background: rgba(16,185,129,.15); color: var(--green2); }
+.score-mid   { background: rgba(245,158,11,.15); color: var(--amber2); }
+.score-low   { background: rgba(239,68,68,.15); color: var(--red2); }
+
+/* EMPTY / LOADING */
+.empty { text-align: center; padding: 32px 16px; color: var(--text3); font-size: 13px; }
+.skeleton { background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%); background-size: 400% 100%; animation: shimmer 1.4s infinite; border-radius: 6px; height: 20px; margin-bottom: 8px; }
+@keyframes shimmer { 0%{background-position:100% 0} 100%{background-position:-100% 0} }
+
+/* DUDA CHIPS */
+.dudas-list { display: flex; flex-direction: column; gap: 8px; max-height: 260px; overflow-y: auto; }
+.duda-item { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; }
+.duda-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.duda-name { font-size: 12px; font-weight: 600; color: var(--blue); }
+.duda-date { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text3); }
+.duda-text { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+/* FOOTER */
+.dash-footer { text-align: center; margin-top: 40px; font-size: 11px; color: var(--text3); font-family: 'JetBrains Mono', monospace; letter-spacing: .05em; }
+
+@media(max-width:720px) {
+  .panels-grid { grid-template-columns: 1fr; }
+  .panel-full { grid-column: 1; }
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div class="header-tag">INFOTEC · CLF-C02 · 2026</div>
+      <div class="header-title">Dashboard de <span>seguimiento</span></div>
+      <div class="header-sub">Tutoría AWS Cloud Practitioner · Iliana Lizbeth Alvarado Lara</div>
+    </div>
+    <div>
+      <button class="refresh-btn" id="refresh-btn" onclick="cargarTodo()">⟳ Actualizar datos</button>
+      <div class="last-update" id="last-update">—</div>
+    </div>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="stats-grid">
+    <div class="stat-card blue">
+      <div class="stat-icon">📋</div>
+      <div class="stat-n" id="s-asistencia">—</div>
+      <div class="stat-label">Asistencias</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-icon">🃏</div>
+      <div class="stat-n" id="s-flashcards">—</div>
+      <div class="stat-label">Flashcards</div>
+    </div>
+    <div class="stat-card purple">
+      <div class="stat-icon">✅</div>
+      <div class="stat-n" id="s-casos">—</div>
+      <div class="stat-label">Casos de uso</div>
+    </div>
+    <div class="stat-card amber">
+      <div class="stat-icon">📝</div>
+      <div class="stat-n" id="s-simulacros">—</div>
+      <div class="stat-label">Simulacros S8</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-icon">❓</div>
+      <div class="stat-n" id="s-dudas">—</div>
+      <div class="stat-label">Dudas</div>
+    </div>
+    <div class="stat-card teal">
+      <div class="stat-icon">📊</div>
+      <div class="stat-n" id="s-prom-casos">—</div>
+      <div class="stat-label">Prom. casos</div>
+    </div>
+  </div>
+
+  <!-- ROW 1: Asistencia + Flashcards -->
+  <div class="panels-grid">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="panel-dot dot-blue"></div>Asistencia por día</div>
+        <div class="panel-badge" id="badge-asistencia">—</div>
+      </div>
+      <canvas id="chart-asistencia"></canvas>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="panel-dot dot-green"></div>Actividad acumulada</div>
+      </div>
+      <canvas id="chart-actividad"></canvas>
+    </div>
+  </div>
+
+  <!-- ROW 2: Casos de uso puntaje + barras por pregunta -->
+  <div class="panels-grid">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="panel-dot dot-purple"></div>Distribución de puntajes — Casos de uso</div>
+      </div>
+      <canvas id="chart-casos"></canvas>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="panel-dot dot-purple"></div>Aciertos por caso (% del grupo)</div>
+      </div>
+      <div id="casos-barras"></div>
+    </div>
+  </div>
+
+  <!-- ROW 3: Simulacros -->
+  <div class="panels-grid">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="panel-dot dot-amber"></div>Puntajes simulacros S8</div>
+      </div>
+      <canvas id="chart-simulacros"></canvas>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="panel-dot dot-amber"></div>Últimos resultados simulacro</div>
+        <div class="panel-badge" id="badge-sim">—</div>
+      </div>
+      <div id="tabla-simulacros"><div class="empty">Sin datos aún</div></div>
+    </div>
+  </div>
+
+  <!-- ROW 4: Dudas recientes (full width) -->
+  <div class="panels-grid">
+    <div class="panel panel-full">
+      <div class="panel-header">
+        <div class="panel-title"><div class="panel-dot" style="background:#ef4444;box-shadow:0 0 8px #ef4444"></div>Dudas recientes</div>
+        <div class="panel-badge" id="badge-dudas">—</div>
+      </div>
+      <div class="dudas-list" id="dudas-list"><div class="empty">Sin datos aún</div></div>
+    </div>
+  </div>
+
+  <div class="dash-footer">
+    INFOTEC · Tutoría AWS Cloud Practitioner · Iliana Lizbeth Alvarado Lara · 2026 ·
+    <a href="mailto:tutor.cpfia1@infotec.mx" style="color:inherit">tutor.cpfia1@infotec.mx</a>
+  </div>
+</div>
+
+<script>
+const BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSji-1o_ol1HXpO3KJBjO1ii4r0r0AAMIHkNUbdW2dzZb629TEyDxI6GYgE5dvYWpAdTiG-senq1jWu/pub';
+const SHEETS = {
+  asistencia:   `${BASE}?gid=706503544&single=true&output=csv`,
+  flashcards:   `${BASE}?gid=1520162726&single=true&output=csv`,
+  dudas:        `${BASE}?gid=1396419005&single=true&output=csv`,
+  casos:        `${BASE}?gid=1026868909&single=true&output=csv`,
+  simulacros:   `${BASE}?gid=1101520668&single=true&output=csv`,
+};
+
+const charts = {};
+
+function parseCSV(url){ return new Promise((res,rej)=>{
+  Papa.parse(url,{ download:true, header:true, skipEmptyLines:true,
+    complete: r => res(r.data), error: e => rej(e) });
+}); }
+
+function setText(id,v){ const el=document.getElementById(id); if(el) el.textContent=v; }
+
+function scoreClass(n){ if(n>=70) return 'score-high'; if(n>=50) return 'score-mid'; return 'score-low'; }
+
+function destroyChart(id){ if(charts[id]){ charts[id].destroy(); delete charts[id]; } }
+
+function makeBarChart(id, labels, data, color, label){
+  destroyChart(id);
+  const ctx = document.getElementById(id).getContext('2d');
+  charts[id] = new Chart(ctx,{
+    type:'bar',
+    data:{ labels, datasets:[{ label, data, backgroundColor: color+'33', borderColor: color, borderWidth:1.5, borderRadius:4 }]},
+    options:{ responsive:true, plugins:{ legend:{display:false} }, scales:{
+      x:{ ticks:{ color:'#9ca3af', font:{size:11} }, grid:{color:'rgba(0,0,0,0.05)'} },
+      y:{ ticks:{ color:'#9ca3af', font:{size:11} }, grid:{color:'rgba(0,0,0,0.05)'}, beginAtZero:true }
+    }}
+  });
+}
+
+function makeLineChart(id, labels, datasets){
+  destroyChart(id);
+  const ctx = document.getElementById(id).getContext('2d');
+  charts[id] = new Chart(ctx,{
+    type:'line',
+    data:{ labels, datasets },
+    options:{ responsive:true, plugins:{ legend:{labels:{color:'#8b9ab8',font:{size:11}}} },
+      scales:{
+        x:{ ticks:{color:'#9ca3af',font:{size:11}}, grid:{color:'rgba(0,0,0,0.05)'} },
+        y:{ ticks:{color:'#9ca3af',font:{size:11}}, grid:{color:'rgba(0,0,0,0.05)'}, beginAtZero:true }
+      }
+    }
+  });
+}
+
+function makeDoughnut(id, labels, data, colors){
+  destroyChart(id);
+  const ctx = document.getElementById(id).getContext('2d');
+  charts[id] = new Chart(ctx,{
+    type:'doughnut',
+    data:{ labels, datasets:[{ data, backgroundColor: colors.map(c=>c+'99'), borderColor: colors, borderWidth:1.5 }]},
+    options:{ responsive:true, cutout:'65%',
+      plugins:{ legend:{ position:'right', labels:{ color:'#4b5563', font:{size:11}, padding:14, boxWidth:12 }}}
+    }
+  });
+}
+
+// Frecuencia por día
+function countByDate(rows, col='Fecha'){
+  const freq={};
+  rows.forEach(r=>{
+    let d = (r[col]||r['Fecha Registro']||'').trim();
+    if(!d) return;
+    // Tomar solo la parte de fecha (sin hora)
+    d = d.split(' ')[0].split(',')[0];
+    freq[d] = (freq[d]||0)+1;
+  });
+  const sorted = Object.keys(freq).sort();
+  return { labels:sorted, data:sorted.map(k=>freq[k]) };
+}
+
+async function cargarAsistencia(){
+  const rows = await parseCSV(SHEETS.asistencia);
+  setText('s-asistencia', rows.length);
+  const {labels,data} = countByDate(rows);
+  setText('badge-asistencia', rows.length+' registros');
+  makeBarChart('chart-asistencia', labels, data, '#3b82f6', 'Asistencias');
+  return rows.length;
+}
+
+async function cargarFlashcards(){
+  const rows = await parseCSV(SHEETS.flashcards);
+  setText('s-flashcards', rows.length);
+  return rows.length;
+}
+
+async function cargarCasos(){
+  const rows = await parseCSV(SHEETS.casos);
+  setText('s-casos', rows.length);
+  if(!rows.length){ setText('s-prom-casos','—'); return 0; }
+
+  // Puntaje promedio
+  const puntajes = rows.map(r=>{
+    const p = parseFloat((r['Puntaje']||'0').replace('%',''));
+    return isNaN(p)?0:p;
+  });
+  const prom = (puntajes.reduce((a,b)=>a+b,0)/puntajes.length).toFixed(0);
+  setText('s-prom-casos', prom+'%');
+
+  // Distribución por rangos
+  const rangos = {'0-20':0,'21-40':0,'41-60':0,'61-80':0,'81-100':0};
+  puntajes.forEach(p=>{
+    if(p<=20) rangos['0-20']++;
+    else if(p<=40) rangos['21-40']++;
+    else if(p<=60) rangos['41-60']++;
+    else if(p<=80) rangos['61-80']++;
+    else rangos['81-100']++;
+  });
+  makeBarChart('chart-casos',
+    Object.keys(rangos), Object.values(rangos), '#8b5cf6', 'Estudiantes');
+
+  // Aciertos por caso (caso1..caso10)
+  const casosBarras = document.getElementById('casos-barras');
+  casosBarras.innerHTML = '';
+  const maxRows = rows.length;
+  for(let i=1;i<=10;i++){
+    const key = 'Caso'+i;
+    const correctas = rows.filter(r=>(r[key]||'').trim()==='✓').length;
+    const pct = maxRows>0?Math.round(correctas/maxRows*100):0;
+    const fillColor = pct>=70?'#10b981':pct>=50?'#f59e0b':'#ef4444';
+    casosBarras.innerHTML += `<div class="prog-row">
+      <div class="prog-label">Caso ${i}</div>
+      <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${fillColor}"></div></div>
+      <div class="prog-val">${pct}%</div>
+    </div>`;
+  }
+  return rows.length;
+}
+
+async function cargarSimulacros(){
+  const rows = await parseCSV(SHEETS.simulacros);
+  setText('s-simulacros', rows.length);
+  setText('badge-sim', rows.length+' registros');
+  if(!rows.length) return 0;
+
+  // Agrupar por tipo de simulacro
+  const tipos={};
+  rows.forEach(r=>{
+    const t=(r['Simulacro']||'Sin tipo').trim();
+    if(!tipos[t]) tipos[t]=[];
+    tipos[t].push(parseFloat(r['Puntaje']||0));
+  });
+  const labels = Object.keys(tipos);
+  const promedios = labels.map(t=>{
+    const arr=tipos[t];
+    return (arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(1);
+  });
+  const colors=['#f59e0b','#3b82f6','#10b981'];
+  makeBarChart('chart-simulacros', labels.map(l=>l.length>30?l.substring(0,30)+'…':l),
+    promedios, '#f59e0b', 'Puntaje promedio');
+
+  // Tabla últimos 8
+  const last8 = rows.slice(-8).reverse();
+  const tablaEl = document.getElementById('tabla-simulacros');
+  tablaEl.innerHTML = `<table class="data-table">
+    <thead><tr><th>Nombre</th><th>Simulacro</th><th>Puntaje</th><th>Fecha</th></tr></thead>
+    <tbody>${last8.map(r=>{
+      const p=parseFloat(r['Puntaje']||0);
+      const sc=scoreClass(p);
+      const sim=(r['Simulacro']||'—').replace('(AWS Skill Builder)','').replace('(BenchPrep)','').trim();
+      return `<tr>
+        <td>${(r['Nombre']||'') + ' ' + (r['Apellido']||'')}</td>
+        <td>${sim}</td>
+        <td><span class="score-badge ${sc}">${p}</span></td>
+        <td>${(r['Fecha Realizacion']||r['Fecha Realización']||'—').trim()}</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>`;
+  return rows.length;
+}
+
+async function cargarDudas(){
+  const rows = await parseCSV(SHEETS.dudas);
+  setText('s-dudas', rows.length);
+  setText('badge-dudas', rows.length+' dudas');
+  const el = document.getElementById('dudas-list');
+  if(!rows.length){ el.innerHTML='<div class="empty">Sin dudas registradas aún</div>'; return 0; }
+  const last10 = rows.slice(-10).reverse();
+  el.innerHTML = last10.map(r=>`
+    <div class="duda-item">
+      <div class="duda-meta">
+        <span class="duda-name">${(r['Nombre']||'')} ${(r['Apellido']||'')}</span>
+        <span class="duda-date">${(r['Fecha']||'').trim()}</span>
+      </div>
+      <div class="duda-text">${r['Duda']||'—'}</div>
+    </div>`).join('');
+  return rows.length;
+}
+
+async function cargarActividad(totales){
+  // Gráfica de líneas acumulada por sección
+  const labels = ['Asistencia','Flashcards','Casos','Simulacros','Dudas'];
+  const data   = totales;
+  makeDoughnut('chart-actividad', labels, data,
+    ['#3b82f6','#10b981','#8b5cf6','#f59e0b','#ef4444']);
+}
+
+async function cargarTodo(){
+  const btn = document.getElementById('refresh-btn');
+  btn.classList.add('loading'); btn.textContent='⟳ Cargando…';
+
+  try{
+    const [a,f,c,s,d] = await Promise.all([
+      cargarAsistencia().catch(()=>0),
+      cargarFlashcards().catch(()=>0),
+      cargarCasos().catch(()=>0),
+      cargarSimulacros().catch(()=>0),
+      cargarDudas().catch(()=>0),
+    ]);
+    await cargarActividad([a,f,c,s,d]);
+    const now = new Date().toLocaleString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    setText('last-update','Actualizado: '+now);
+  }catch(e){ console.error(e); }
+
+  btn.classList.remove('loading'); btn.textContent='⟳ Actualizar datos';
+}
+
+// Cargar al inicio
+cargarTodo();
+</script>
+</body>
+</html>
