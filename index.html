@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — Tutoría INFOTEC CLF-C02</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -24,9 +23,9 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .refresh-btn{display:inline-flex;align-items:center;gap:7px;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:9px 18px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.07)}
 .refresh-btn:hover{border-color:var(--blue);color:var(--blue)}
 .refresh-btn.loading{opacity:.6;pointer-events:none}
-.pdf-btn{display:inline-flex;align-items:center;gap:7px;background:#dbeafe;border:1px solid rgba(59,130,246,.3);border-radius:10px;padding:9px 18px;font-size:13px;font-weight:500;color:#1d4ed8;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s;white-space:nowrap}
-.pdf-btn:hover{background:#bfdbfe}
-.pdf-btn:disabled{opacity:.5;cursor:not-allowed}
+
+
+
 .last-update{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3)}
 
 /* STAT CARDS */
@@ -126,7 +125,6 @@ canvas{max-height:200px}
     <div class="header-right">
       <div style="display:flex;gap:8px">
         <button class="refresh-btn" id="refresh-btn" onclick="cargarTodo()">⟳ Actualizar datos</button>
-        <button class="pdf-btn" id="pdf-btn" onclick="generarPDF()">📄 PDF ejecutivo</button>
       </div>
       <div class="last-update" id="last-update">—</div>
     </div>
@@ -274,7 +272,7 @@ canvas{max-height:200px}
 </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyUOyhs2CnuI7znZUGh0TmTr6Y7hSogdl0kOdUsVVXv4KMJeyVo3rOksSs2tXILocvE4A/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbytFAIGhj7vCwOAWwdZw-PYvanxd4z71BE2H1Wfk-Jqnu0JWJMj5ZiHqLXzVNjdnG138Q/exec';
 const charts = {};
 let _cache = {};
 
@@ -526,48 +524,6 @@ function calcularSemaforo(asist,flash,casos,simI){
   setText('badge-semaforo',vistos.size+' estudiantes');
 }
 
-// ── PDF EJECUTIVO ────────────────────────────────────────────
-function generarPDF(){
-  const btn=document.getElementById('pdf-btn');
-  btn.disabled=true;btn.textContent='⏳ Generando…';
-  try{
-    const{jsPDF}=window.jspdf;
-    const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-    const W=210,M=15,CW=W-M*2;
-    const F=(sz,b,rgb)=>{doc.setFontSize(sz);doc.setFont('helvetica',b?'bold':'normal');doc.setTextColor(...(rgb||[30,41,59]));};
-    const R=(x,y,w,h,rgb)=>{doc.setFillColor(...rgb);doc.rect(x,y,w,h,'F');};
-    const T=(t,x,y,o)=>doc.text(String(t),x,y,o||{});
-    const now=new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric'});
-    const d=_cache;
-
-    R(0,0,W,55,[30,64,175]);R(0,51,W,4,[99,102,241]);
-    F(8,false,[165,180,252]);T('INFOTEC  |  TUTORÍA AWS CLOUD PRACTITIONER  |  CLF-C02',M,12);
-    F(18,true,[255,255,255]);T('Reporte ejecutivo de seguimiento',M,28);
-    F(10,false,[147,197,253]);T('Preparación para la certificación AWS Cloud Practitioner',M,40);
-    F(8,false,[147,197,253]);T('Tutora: Iliana Lizbeth Alvarado Lara  ·  Generado: '+now,M,52);
-
-    let y=68;
-    F(10,true,[71,85,105]);T('RESUMEN GENERAL',M,y);y+=5;
-    R(M,y,CW,0.5,[226,232,240]);y+=5;
-
-    const asist=d.asistencia||[], flash=d.flashcards||[], casos=d.casos||[], simI=d.simINFOTEC||[];
-    const unicos=new Set(asist.map(r=>String(r['Correo']||'').toLowerCase())).size;
-    const stats=[['Estudiantes únicos registrados',unicos],['Registros de entrada al sitio',asist.length],['Sesiones de flashcards',flash.length],['Casos de uso completados',casos.length],['Simulacros INFOTEC realizados',simI.length],['Simulacros AWS oficiales',(d.simulacrosAWS||[]).length],['Dudas enviadas',(d.dudas||[]).length]];
-    stats.forEach(([k,v])=>{F(9,false,[30,41,59]);T(k,M+4,y);F(9,true,[37,99,235]);T(String(v),W-M-4,y,{align:'right'});y+=7;});
-
-    y+=5;F(10,true,[71,85,105]);T('SEMÁFORO DE PREPARACIÓN',M,y);y+=5;
-    R(M,y,CW,0.5,[226,232,240]);y+=5;
-
-    const sem={azul:parseInt(document.getElementById('sem-azul').textContent)||0,verde:parseInt(document.getElementById('sem-verde').textContent)||0,amarillo:parseInt(document.getElementById('sem-amarillo').textContent)||0,rojo:parseInt(document.getElementById('sem-rojo').textContent)||0,gris:parseInt(document.getElementById('sem-gris').textContent)||0};
-    [['🔵 Listos para el examen (simulacro ≥ 80%)',sem.azul,[37,99,235]],['🟢 Buen avance (simulacro 70–79%)',sem.verde,[5,150,105]],['🟡 En proceso (con actividad, sim < 70%)',sem.amarillo,[217,119,6]],['🔴 En riesgo (actividad sin simulacro)',sem.rojo,[220,38,38]],['⚪ Sin actividad adicional al registro',sem.gris,[107,114,128]]].forEach(([k,v,c])=>{F(9,false,c);T(k,M+4,y);F(9,true,c);T(String(v),W-M-4,y,{align:'right'});y+=7;});
-
-    R(0,280,W,17,[30,64,175]);
-    F(7,false,[165,180,252]);T('INFOTEC  |  Tutoría AWS Cloud Practitioner  |  Iliana Lizbeth Alvarado Lara  |  '+now,M,288);
-    doc.text('1/1',W-M,288,{align:'right'});
-    doc.save('Reporte-CLF-C02-'+now.replace(/\//g,'-')+'.pdf');
-  }catch(e){alert('Error al generar PDF: '+e.message);}
-  btn.disabled=false;btn.textContent='📄 PDF ejecutivo';
-}
 
 cargarTodo();
 </script>
