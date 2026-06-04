@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — Tutoría INFOTEC CLF-C02</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -16,44 +15,33 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .wrapper{max-width:1200px;margin:0 auto;padding:28px 20px 60px;position:relative;z-index:1}
 
 /* HEADER */
-.header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:20px;flex-wrap:wrap}
+.header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;gap:20px;flex-wrap:wrap}
 .header-tag{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--blue);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}
 .header-title{font-size:clamp(22px,3.5vw,32px);font-weight:700;color:var(--text);line-height:1.1;letter-spacing:-.02em}
 .header-title span{color:var(--blue)}
 .header-sub{font-size:13px;color:var(--text2);margin-top:6px}
-.header-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-.refresh-btn{display:inline-flex;align-items:center;gap:7px;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:9px 16px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.header-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.refresh-btn{display:inline-flex;align-items:center;gap:7px;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:9px 18px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.07)}
 .refresh-btn:hover{border-color:var(--blue);color:var(--blue)}
 .refresh-btn.loading{opacity:.6;pointer-events:none}
-.last-update{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);margin-top:5px;text-align:right}
-
-/* BOTONES DE ACCIÓN */
-.action-strip{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;box-shadow:0 1px 8px rgba(0,0,0,.05)}
-.action-strip-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;width:100%;margin-bottom:4px}
-.act-btn{display:inline-flex;align-items:center;gap:7px;border:none;border-radius:10px;padding:9px 16px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s;white-space:nowrap}
-.act-btn:disabled{opacity:.5;cursor:not-allowed}
-.act-btn.blue{background:#dbeafe;color:#1d4ed8}.act-btn.blue:hover:not(:disabled){background:#bfdbfe}
-.act-btn.amber{background:#fef3c7;color:#92400e}.act-btn.amber:hover:not(:disabled){background:#fde68a}
-.act-btn.green{background:#d1fae5;color:#065f46}.act-btn.green:hover:not(:disabled){background:#a7f3d0}
-.act-btn.purple{background:#ede9fe;color:#5b21b6}.act-btn.purple:hover:not(:disabled){background:#ddd6fe}
-.act-btn.red{background:#fee2e2;color:#991b1b}.act-btn.red:hover:not(:disabled){background:#fecaca}
-.act-msg{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:6px;margin-left:auto}
+.pdf-btn{display:inline-flex;align-items:center;gap:7px;background:#dbeafe;border:1px solid rgba(59,130,246,.3);border-radius:10px;padding:9px 18px;font-size:13px;font-weight:500;color:#1d4ed8;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s;white-space:nowrap}
+.pdf-btn:hover{background:#bfdbfe}
+.pdf-btn:disabled{opacity:.5;cursor:not-allowed}
+.last-update{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3)}
 
 /* STAT CARDS */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:20px}
-.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px;position:relative;overflow:hidden;transition:border-color .2s;box-shadow:0 1px 8px rgba(0,0,0,.05)}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin-bottom:20px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px;position:relative;overflow:hidden;box-shadow:0 1px 8px rgba(0,0,0,.05)}
 .stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px}
-.stat-card.blue::after{background:var(--blue)}.stat-card.green::after{background:var(--green)}.stat-card.purple::after{background:var(--purple)}.stat-card.amber::after{background:var(--amber)}.stat-card.red::after{background:var(--red)}.stat-card.teal::after{background:var(--teal)}.stat-card.gray::after{background:var(--gray)}
+.stat-card.blue::after{background:var(--blue)}.stat-card.green::after{background:var(--green)}.stat-card.purple::after{background:var(--purple)}.stat-card.amber::after{background:var(--amber)}.stat-card.red::after{background:var(--red)}.stat-card.teal::after{background:var(--teal)}
 .stat-icon{font-size:20px;margin-bottom:10px}
 .stat-n{font-size:32px;font-weight:700;letter-spacing:-.03em;line-height:1;margin-bottom:4px}
-.stat-card.blue .stat-n{color:var(--blue2)}.stat-card.green .stat-n{color:var(--green2)}.stat-card.purple .stat-n{color:var(--purple2)}.stat-card.amber .stat-n{color:var(--amber2)}.stat-card.red .stat-n{color:var(--red2)}.stat-card.teal .stat-n{color:var(--teal)}.stat-card.gray .stat-n{color:var(--gray)}
+.stat-card.blue .stat-n{color:var(--blue2)}.stat-card.green .stat-n{color:var(--green2)}.stat-card.purple .stat-n{color:var(--purple2)}.stat-card.amber .stat-n{color:var(--amber2)}.stat-card.red .stat-n{color:var(--red2)}.stat-card.teal .stat-n{color:var(--teal)}
 .stat-label{font-size:11px;color:var(--text2);font-weight:500;text-transform:uppercase;letter-spacing:.06em}
 
 /* PANELS */
-.panels-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.panels-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 .panel-full{grid-column:1/-1}
-.panel-third{grid-column:span 1}
-.panels-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
 .panel{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:0 1px 10px rgba(0,0,0,.05)}
 .panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .panel-title{font-size:12px;font-weight:600;color:var(--text);letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
@@ -63,40 +51,46 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .dot-purple{background:var(--purple);box-shadow:0 0 6px rgba(139,92,246,.4)}
 .dot-amber{background:var(--amber);box-shadow:0 0 6px rgba(245,158,11,.4)}
 .dot-teal{background:var(--teal);box-shadow:0 0 6px rgba(20,184,166,.4)}
-.dot-red{background:var(--red);box-shadow:0 0 8px var(--red)}
+.dot-red{background:var(--red)}
 .panel-badge{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3)}
 canvas{max-height:200px}
 
 /* SEMÁFORO */
-.semaforo-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.semaforo-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
 .sem-card{border-radius:12px;padding:12px 8px;text-align:center;border:1px solid transparent}
 .sem-card.azul{background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.3)}
 .sem-card.verde{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.3)}
 .sem-card.amarillo{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3)}
 .sem-card.rojo{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3)}
 .sem-card.gris{background:rgba(107,114,128,.1);border-color:rgba(107,114,128,.3)}
-.sem-emoji{font-size:24px;margin-bottom:6px}
-.sem-n{font-size:24px;font-weight:700;margin-bottom:2px}
+.sem-emoji{font-size:22px;margin-bottom:5px}
+.sem-n{font-size:26px;font-weight:700;margin-bottom:2px}
 .sem-card.azul .sem-n{color:var(--blue2)}.sem-card.verde .sem-n{color:var(--green2)}.sem-card.amarillo .sem-n{color:var(--amber2)}.sem-card.rojo .sem-n{color:var(--red2)}.sem-card.gris .sem-n{color:var(--gray)}
 .sem-label{font-size:10px;color:var(--text2);font-weight:500;text-transform:uppercase;letter-spacing:.05em}
+.sem-desc{font-size:11px;color:var(--text3);line-height:1.7;margin-top:10px}
 
 /* TABLE */
 .data-table{width:100%;border-collapse:collapse}
-.data-table th{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
-.data-table td{font-size:12px;color:var(--text2);padding:9px 12px;border-bottom:1px solid var(--border)}
+.data-table th{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;padding:8px 10px;text-align:left;border-bottom:1px solid var(--border)}
+.data-table td{font-size:12px;color:var(--text2);padding:9px 10px;border-bottom:1px solid var(--border)}
 .data-table tr:last-child td{border-bottom:none}
 .data-table tr:hover td{background:rgba(0,0,0,.02);color:var(--text)}
 
 /* PROGRESS */
-.prog-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.prog-row{display:flex;align-items:center;gap:10px;margin-bottom:11px}
 .prog-row:last-child{margin-bottom:0}
-.prog-label{font-size:12px;color:var(--text2);width:120px;flex-shrink:0}
+.prog-label{font-size:12px;color:var(--text2);width:110px;flex-shrink:0}
 .prog-track{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
 .prog-fill{height:100%;border-radius:3px;transition:width .8s ease}
 .prog-val{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text3);width:40px;text-align:right;flex-shrink:0}
 
-/* SCORE BADGE */
-.score-badge{display:inline-flex;align-items:center;justify-content:center;min-width:48px;padding:3px 10px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500}
+/* SESIONES */
+.sesion-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sesion-tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.s1-tag{background:#dbeafe;color:#1d4ed8}.s2-tag{background:#fee2e2;color:#991b1b}.s3-tag{background:#d1fae5;color:#065f46}
+
+/* SCORE */
+.score-badge{display:inline-flex;align-items:center;justify-content:center;min-width:46px;padding:3px 8px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500}
 .score-high{background:rgba(16,185,129,.15);color:var(--green2)}
 .score-mid{background:rgba(245,158,11,.15);color:var(--amber2)}
 .score-low{background:rgba(239,68,68,.15);color:var(--red2)}
@@ -109,24 +103,14 @@ canvas{max-height:200px}
 .duda-date{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3)}
 .duda-text{font-size:12px;color:var(--text2);line-height:1.5}
 
-/* SESIONES BREAKDOWN */
-.sesion-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.sesion-tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
-.s1-tag{background:#dbeafe;color:#1d4ed8}.s2-tag{background:#fee2e2;color:#991b1b}.s3-tag{background:#d1fae5;color:#065f46}
-
-/* DOMAIN BARS */
-.domain-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.domain-label{font-size:11px;font-weight:600;color:var(--text2);width:30px;flex-shrink:0;font-family:'JetBrains Mono',monospace}
-
 /* MISC */
 .empty{text-align:center;padding:28px 16px;color:var(--text3);font-size:13px}
-.skeleton{background:linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%);background-size:400% 100%;animation:shimmer 1.4s infinite;border-radius:6px;height:20px;margin-bottom:8px}
-@keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
-.section-divider{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin:24px 0 12px;display:flex;align-items:center;gap:10px}
-.section-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.section-div{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin:22px 0 12px;display:flex;align-items:center;gap:10px}
+.section-div::after{content:'';flex:1;height:1px;background:var(--border)}
 .dash-footer{text-align:center;margin-top:40px;font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;letter-spacing:.05em}
+.error-msg{background:#fee2e2;border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:12px 16px;font-size:13px;color:#991b1b;margin-bottom:16px;display:none}
 
-@media(max-width:720px){.panels-grid,.panels-3{grid-template-columns:1fr}.panel-full,.panel-third{grid-column:1}.stats-grid{grid-template-columns:repeat(2,1fr)}.semaforo-grid{grid-template-columns:repeat(3,1fr)}.header-actions{width:100%}.action-strip{flex-direction:column}}
+@media(max-width:720px){.panels-2{grid-template-columns:1fr}.panel-full{grid-column:1}.stats-grid{grid-template-columns:repeat(2,1fr)}.semaforo-grid{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
 <body>
@@ -134,27 +118,22 @@ canvas{max-height:200px}
 
   <!-- HEADER -->
   <div class="header">
-    <div class="header-left">
+    <div>
       <div class="header-tag">INFOTEC · CLF-C02 · 2026</div>
       <div class="header-title">Dashboard de <span>seguimiento</span></div>
       <div class="header-sub">Tutoría AWS Cloud Practitioner · Iliana Lizbeth Alvarado Lara</div>
     </div>
-    <div class="header-actions">
-      <button class="refresh-btn" id="refresh-btn" onclick="cargarTodo()">⟳ Actualizar datos</button>
+    <div class="header-right">
+      <div style="display:flex;gap:8px">
+        <button class="refresh-btn" id="refresh-btn" onclick="cargarTodo()">⟳ Actualizar datos</button>
+        <button class="pdf-btn" id="pdf-btn" onclick="generarPDF()">📄 PDF ejecutivo</button>
+      </div>
       <div class="last-update" id="last-update">—</div>
     </div>
   </div>
 
-  <!-- BOTONES DE ACCIÓN -->
-  <div class="action-strip">
-    <div class="action-strip-label">Acciones — Correos y reportes</div>
-    <button class="act-btn blue" onclick="ejecutarAccion('recordatorio_lunes','btn-lunes')" id="btn-lunes">📧 Recordatorio lunes</button>
-    <button class="act-btn amber" onclick="ejecutarAccion('alerta_inactivos','btn-inactivos')" id="btn-inactivos">⚠️ Alertar inactivos</button>
-    <button class="act-btn green" onclick="ejecutarAccion('avance_viernes','btn-viernes')" id="btn-viernes">📊 Avance personal (viernes)</button>
-    <button class="act-btn purple" onclick="ejecutarAccion('reporte_jefes','btn-jefes')" id="btn-jefes">📨 Reporte a jefes</button>
-    <button class="act-btn red" onclick="generarPDFEjecutivo()" id="btn-pdf">📄 Descargar PDF ejecutivo</button>
-    <div class="act-msg" id="act-msg"></div>
-  </div>
+  <!-- ERROR -->
+  <div class="error-msg" id="error-msg"></div>
 
   <!-- STAT CARDS -->
   <div class="stats-grid">
@@ -163,16 +142,14 @@ canvas{max-height:200px}
     <div class="stat-card green"><div class="stat-icon">🃏</div><div class="stat-n" id="s-flashcards">—</div><div class="stat-label">Sesiones flashcards</div></div>
     <div class="stat-card purple"><div class="stat-icon">✅</div><div class="stat-n" id="s-casos">—</div><div class="stat-label">Casos completados</div></div>
     <div class="stat-card teal"><div class="stat-icon">📊</div><div class="stat-n" id="s-prom-casos">—</div><div class="stat-label">Prom. casos de uso</div></div>
-    <div class="stat-card amber"><div class="stat-icon">📝</div><div class="stat-n" id="s-sim-infotec">—</div><div class="stat-label">Simulacros INFOTEC</div></div>
+    <div class="stat-card teal"><div class="stat-icon">📝</div><div class="stat-n" id="s-sim-infotec">—</div><div class="stat-label">Simulacros INFOTEC</div></div>
     <div class="stat-card amber"><div class="stat-icon">🎯</div><div class="stat-n" id="s-simulacros">—</div><div class="stat-label">Simulacros AWS</div></div>
     <div class="stat-card red"><div class="stat-icon">❓</div><div class="stat-n" id="s-dudas">—</div><div class="stat-label">Dudas enviadas</div></div>
   </div>
 
-  <!-- SECCIÓN: SEGUIMIENTO GENERAL -->
-  <div class="section-divider">Seguimiento general</div>
-
-  <!-- ROW 1: Asistencia + Semáforo -->
-  <div class="panels-grid">
+  <!-- SEGUIMIENTO GENERAL -->
+  <div class="section-div">Seguimiento general</div>
+  <div class="panels-2">
     <div class="panel">
       <div class="panel-header">
         <div class="panel-title"><div class="panel-dot dot-blue"></div>Entradas al sitio por día</div>
@@ -185,21 +162,18 @@ canvas{max-height:200px}
         <div class="panel-title"><div class="panel-dot dot-teal"></div>Semáforo de preparación</div>
         <div class="panel-badge" id="badge-semaforo">—</div>
       </div>
-      <div class="semaforo-grid" id="semaforo-grid">
+      <div class="semaforo-grid">
         <div class="sem-card azul"><div class="sem-emoji">🔵</div><div class="sem-n" id="sem-azul">—</div><div class="sem-label">Listo</div></div>
         <div class="sem-card verde"><div class="sem-emoji">🟢</div><div class="sem-n" id="sem-verde">—</div><div class="sem-label">Buen avance</div></div>
         <div class="sem-card amarillo"><div class="sem-emoji">🟡</div><div class="sem-n" id="sem-amarillo">—</div><div class="sem-label">En proceso</div></div>
         <div class="sem-card rojo"><div class="sem-emoji">🔴</div><div class="sem-n" id="sem-rojo">—</div><div class="sem-label">En riesgo</div></div>
         <div class="sem-card gris"><div class="sem-emoji">⚪</div><div class="sem-n" id="sem-gris">—</div><div class="sem-label">Sin actividad</div></div>
       </div>
-      <div style="margin-top:14px;font-size:11px;color:var(--text3);line-height:1.7">
-        🔵 Simulacro ≥ 80% · 🟢 70–79% · 🟡 40–69% · 🔴 &lt;40% con actividad · ⚪ Sin registros adicionales
-      </div>
+      <div class="sem-desc">🔵 Sim. ≥80% · 🟢 70–79% · 🟡 Con actividad, sim &lt;70% · 🔴 Actividad sin simulacro · ⚪ Solo registro de entrada</div>
     </div>
   </div>
 
-  <!-- ROW 2: Actividad acumulada + Flashcards por sesión -->
-  <div class="panels-grid">
+  <div class="panels-2">
     <div class="panel">
       <div class="panel-header">
         <div class="panel-title"><div class="panel-dot dot-blue"></div>Actividad acumulada</div>
@@ -210,14 +184,13 @@ canvas{max-height:200px}
       <div class="panel-header">
         <div class="panel-title"><div class="panel-dot dot-green"></div>Flashcards por sesión</div>
       </div>
-      <div id="flash-sesiones"></div>
+      <div id="flash-sesiones"><div class="empty">Sin datos</div></div>
     </div>
   </div>
 
-  <!-- SECCIÓN: CASOS DE USO -->
-  <div class="section-divider">Casos de uso</div>
-
-  <div class="panels-grid">
+  <!-- CASOS DE USO -->
+  <div class="section-div">Casos de uso</div>
+  <div class="panels-2">
     <div class="panel">
       <div class="panel-header">
         <div class="panel-title"><div class="panel-dot dot-purple"></div>Distribución de puntajes</div>
@@ -227,19 +200,17 @@ canvas{max-height:200px}
     <div class="panel">
       <div class="panel-header">
         <div class="panel-title"><div class="panel-dot dot-purple"></div>Aciertos por caso (% del grupo)</div>
-        <div class="panel-badge" id="badge-sesion-casos">Sesión 1</div>
       </div>
-      <div id="casos-barras"></div>
+      <div id="casos-barras"><div class="empty">Sin datos</div></div>
     </div>
   </div>
 
-  <!-- SECCIÓN: SIMULACRO INFOTEC -->
-  <div class="section-divider">Simulacro INFOTEC — 65 preguntas</div>
-
-  <div class="panels-grid">
+  <!-- SIMULACRO INFOTEC -->
+  <div class="section-div">Simulacro INFOTEC — 65 preguntas</div>
+  <div class="panels-2">
     <div class="panel">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-dot dot-teal"></div>Distribución puntajes INFOTEC</div>
+        <div class="panel-title"><div class="panel-dot dot-teal"></div>Distribución de puntajes</div>
         <div class="panel-badge" id="badge-sim-infotec">—</div>
       </div>
       <canvas id="chart-sim-infotec"></canvas>
@@ -248,32 +219,27 @@ canvas{max-height:200px}
       <div class="panel-header">
         <div class="panel-title"><div class="panel-dot dot-teal"></div>Promedio por dominio</div>
       </div>
-      <div id="dominios-barras">
-        <div class="domain-row"><div class="domain-label">D1</div><div class="prog-track"><div class="prog-fill" id="d1-fill" style="width:0%;background:#3b82f6"></div></div><div class="prog-val" id="d1-val">—</div></div>
-        <div class="domain-row"><div class="domain-label">D2</div><div class="prog-track"><div class="prog-fill" id="d2-fill" style="width:0%;background:#ef4444"></div></div><div class="prog-val" id="d2-val">—</div></div>
-        <div class="domain-row"><div class="domain-label">D3</div><div class="prog-track"><div class="prog-fill" id="d3-fill" style="width:0%;background:#10b981"></div></div><div class="prog-val" id="d3-val">—</div></div>
-        <div class="domain-row"><div class="domain-label">D4</div><div class="prog-track"><div class="prog-fill" id="d4-fill" style="width:0%;background:#f59e0b"></div></div><div class="prog-val" id="d4-val">—</div></div>
-        <div style="margin-top:14px;font-size:11px;color:var(--text3);line-height:1.8">
-          D1 Conceptos cloud · 24%<br>D2 Seguridad · 30%<br>D3 Tecnología · 34%<br>D4 Facturación · 12%
-        </div>
+      <div>
+        <div class="prog-row"><div class="prog-label">D1 · Conceptos</div><div class="prog-track"><div class="prog-fill" id="d1-fill" style="width:0%;background:#3b82f6"></div></div><div class="prog-val" id="d1-val">—</div></div>
+        <div class="prog-row"><div class="prog-label">D2 · Seguridad</div><div class="prog-track"><div class="prog-fill" id="d2-fill" style="width:0%;background:#ef4444"></div></div><div class="prog-val" id="d2-val">—</div></div>
+        <div class="prog-row"><div class="prog-label">D3 · Tecnología</div><div class="prog-track"><div class="prog-fill" id="d3-fill" style="width:0%;background:#10b981"></div></div><div class="prog-val" id="d3-val">—</div></div>
+        <div class="prog-row"><div class="prog-label">D4 · Facturación</div><div class="prog-track"><div class="prog-fill" id="d4-fill" style="width:0%;background:#f59e0b"></div></div><div class="prog-val" id="d4-val">—</div></div>
+        <div style="margin-top:14px;font-size:11px;color:var(--text3)">D1 24% · D2 30% · D3 34% · D4 12%</div>
       </div>
     </div>
   </div>
-
-  <div class="panels-grid">
+  <div class="panels-2">
     <div class="panel panel-full">
       <div class="panel-header">
         <div class="panel-title"><div class="panel-dot dot-teal"></div>Últimos resultados — Simulacro INFOTEC</div>
-        <div class="panel-badge" id="badge-tabla-infotec">—</div>
       </div>
       <div id="tabla-sim-infotec"><div class="empty">Sin datos aún</div></div>
     </div>
   </div>
 
-  <!-- SECCIÓN: SIMULACROS AWS -->
-  <div class="section-divider">Simulacros oficiales AWS (BenchPrep)</div>
-
-  <div class="panels-grid">
+  <!-- SIMULACROS AWS -->
+  <div class="section-div">Simulacros oficiales AWS (BenchPrep)</div>
+  <div class="panels-2">
     <div class="panel">
       <div class="panel-header">
         <div class="panel-title"><div class="panel-dot dot-amber"></div>Puntajes por simulacro</div>
@@ -289,10 +255,9 @@ canvas{max-height:200px}
     </div>
   </div>
 
-  <!-- SECCIÓN: DUDAS -->
-  <div class="section-divider">Dudas recientes</div>
-
-  <div class="panels-grid">
+  <!-- DUDAS -->
+  <div class="section-div">Dudas recientes</div>
+  <div class="panels-2">
     <div class="panel panel-full">
       <div class="panel-header">
         <div class="panel-title"><div class="panel-dot dot-red"></div>Dudas de los estudiantes</div>
@@ -309,419 +274,301 @@ canvas{max-height:200px}
 </div>
 
 <script>
-// ── CONFIGURACIÓN ────────────────────────────────────────────
-const BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSji-1o_ol1HXpO3KJBjO1ii4r0r0AAMIHkNUbdW2dzZb629TEyDxI6GYgE5dvYWpAdTiG-senq1jWu/pub';
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyUOyhs2CnuI7znZUGh0TmTr6Y7hSogdl0kOdUsVVXv4KMJeyVo3rOksSs2tXILocvE4A/exec';
-
-const SHEETS = {
-  asistencia:      `${BASE}?gid=706503544&single=true&output=csv`,
-  flashcards:      `${BASE}?gid=1520162726&single=true&output=csv`,
-  dudas:           `${BASE}?gid=1396419005&single=true&output=csv`,
-  casos:           `${BASE}?gid=1026868909&single=true&output=csv`,
-  simulacros:      `${BASE}?gid=1101520668&single=true&output=csv`,
-  // ⚠️ Reemplaza GID_SIMULACRO_INFOTEC con el GID real de la hoja SimulacroExamenINFOTEC
-  simINFOTEC:      `${BASE}?gid=GID_SIMULACRO_INFOTEC&single=true&output=csv`,
-};
-
 const charts = {};
-let _datosGlobales = {}; // Cache para PDF
+let _cache = {};
 
-// ── HELPERS ──────────────────────────────────────────────────
-function parseCSV(url){
-  return new Promise((res,rej)=>{
-    Papa.parse(url,{download:true,header:true,skipEmptyLines:true,
-      complete:r=>res(r.data),error:e=>rej(e)});
-  });
-}
 function setText(id,v){const el=document.getElementById(id);if(el)el.textContent=v;}
-function scoreClass(n){if(n>=70)return 'score-high';if(n>=50)return 'score-mid';return 'score-low';}
+function pct(v){const n=parseFloat(String(v||'0').replace('%',''));return isNaN(n)?0:n;}
+function scoreClass(n){return n>=70?'score-high':n>=50?'score-mid':'score-low';}
 function destroyChart(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
-function norm(v){return String(v||'').trim().toLowerCase();}
 
-function pctNum(v){
-  const n=parseFloat(String(v||'0').replace('%',''));
-  return isNaN(n)?0:n;
-}
-
-function makeBarChart(id,labels,data,color,label){
+function makeBar(id,labels,data,color,label){
   destroyChart(id);
   const ctx=document.getElementById(id);if(!ctx)return;
-  charts[id]=new Chart(ctx.getContext('2d'),{
-    type:'bar',
+  charts[id]=new Chart(ctx.getContext('2d'),{type:'bar',
     data:{labels,datasets:[{label,data,backgroundColor:color+'33',borderColor:color,borderWidth:1.5,borderRadius:4}]},
     options:{responsive:true,plugins:{legend:{display:false}},scales:{
       x:{ticks:{color:'#9ca3af',font:{size:10}},grid:{color:'rgba(0,0,0,0.04)'}},
-      y:{ticks:{color:'#9ca3af',font:{size:10}},grid:{color:'rgba(0,0,0,0.04)'},beginAtZero:true}
-    }}
-  });
+      y:{ticks:{color:'#9ca3af',font:{size:10}},grid:{color:'rgba(0,0,0,0.04)'},beginAtZero:true}}}});
 }
 
 function makeDoughnut(id,labels,data,colors){
   destroyChart(id);
   const ctx=document.getElementById(id);if(!ctx)return;
-  charts[id]=new Chart(ctx.getContext('2d'),{
-    type:'doughnut',
+  charts[id]=new Chart(ctx.getContext('2d'),{type:'doughnut',
     data:{labels,datasets:[{data,backgroundColor:colors.map(c=>c+'99'),borderColor:colors,borderWidth:1.5}]},
     options:{responsive:true,cutout:'60%',
-      plugins:{legend:{position:'right',labels:{color:'#4b5563',font:{size:11},padding:12,boxWidth:12}}}}
-  });
+      plugins:{legend:{position:'right',labels:{color:'#4b5563',font:{size:11},padding:10,boxWidth:12}}}}});
 }
 
 function countByDate(rows){
   const freq={};
   rows.forEach(r=>{
-    let d=(r['Fecha']||r['Fecha Registro']||'').trim();
-    if(!d)return;
-    d=d.split(' ')[0].split(',')[0];
-    freq[d]=(freq[d]||0)+1;
+    const raw=String(r['Fecha']||r['Fecha Registro']||'').trim();
+    if(!raw)return;
+    // Normalizar fecha dd/MM/yyyy o similar
+    const part=raw.split(',')[0].trim();
+    freq[part]=(freq[part]||0)+1;
   });
-  const sorted=Object.keys(freq).sort();
+  const sorted=Object.keys(freq).sort((a,b)=>{
+    // Ordenar por fecha real
+    const pa=a.split('/'), pb=b.split('/');
+    if(pa.length===3&&pb.length===3){
+      const da=new Date(pa[2],pa[1]-1,pa[0]), db=new Date(pb[2],pb[1]-1,pb[0]);
+      return da-db;
+    }
+    return a.localeCompare(b);
+  });
   return{labels:sorted,data:sorted.map(k=>freq[k])};
 }
 
-// ── CARGAR ASISTENCIA ────────────────────────────────────────
-async function cargarAsistencia(){
-  const rows=await parseCSV(SHEETS.asistencia);
-  const unicos=new Set(rows.map(r=>norm(r['Correo'])));
-  setText('s-asistencia',rows.length);
-  setText('s-estudiantes',unicos.size);
-  const{labels,data}=countByDate(rows);
-  setText('badge-asistencia',rows.length+' registros');
-  makeBarChart('chart-asistencia',labels,data,'#3b82f6','Entradas');
-  _datosGlobales.asistencia=rows;
-  _datosGlobales.estudiantesUnicos=unicos.size;
-  return{total:rows.length,unicos};
-}
+// ── CARGA PRINCIPAL ──────────────────────────────────────────
+async function cargarTodo(){
+  const btn=document.getElementById('refresh-btn');
+  btn.classList.add('loading');btn.textContent='⟳ Cargando…';
+  const errEl=document.getElementById('error-msg');
+  errEl.style.display='none';
 
-// ── CARGAR FLASHCARDS ────────────────────────────────────────
-async function cargarFlashcards(){
-  const rows=await parseCSV(SHEETS.flashcards);
-  setText('s-flashcards',rows.length);
-  _datosGlobales.flashcards=rows;
+  try{
+    const res=await fetch(SCRIPT_URL+'?accion=datos',{redirect:'follow'});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const d=await res.json();
+    if(d.result!=='ok')throw new Error(d.message||'Error en el servidor');
 
-  // Por sesión
-  const s1=rows.filter(r=>norm(r['Sesion'])==='sesion 1').length;
-  const s2=rows.filter(r=>norm(r['Sesion'])==='sesion 2').length;
-  const s3=rows.filter(r=>norm(r['Sesion'])==='sesion 3').length;
-  const max=Math.max(s1,s2,s3,1);
-  const el=document.getElementById('flash-sesiones');
-  if(el){
-    el.innerHTML=[
-      {label:'Sesión 1',n:s1,cls:'s1-tag',color:'#3b82f6'},
-      {label:'Sesión 2',n:s2,cls:'s2-tag',color:'#ef4444'},
-      {label:'Sesión 3',n:s3,cls:'s3-tag',color:'#10b981'},
-    ].map(s=>`
-      <div class="sesion-row">
-        <span class="sesion-tag ${s.cls}">${s.label}</span>
-        <div class="prog-track" style="flex:1"><div class="prog-fill" style="width:${Math.round(s.n/max*100)}%;background:${s.color}"></div></div>
-        <div class="prog-val">${s.n}</div>
-      </div>`).join('');
+    _cache=d;
+    procesarDatos(d);
+    setText('last-update','Actualizado: '+d.timestamp);
+
+  }catch(e){
+    errEl.textContent='⚠️ No se pudieron cargar los datos: '+e.message+'. Verifica que el Apps Script esté publicado como aplicación web.';
+    errEl.style.display='block';
+    console.error(e);
   }
-  return rows.length;
+
+  btn.classList.remove('loading');btn.textContent='⟳ Actualizar datos';
 }
 
-// ── CARGAR CASOS DE USO ──────────────────────────────────────
-async function cargarCasos(){
-  const rows=await parseCSV(SHEETS.casos);
-  setText('s-casos',rows.length);
-  _datosGlobales.casos=rows;
-  if(!rows.length){setText('s-prom-casos','—');return 0;}
+function procesarDatos(d){
+  const asist  = d.asistencia    ||[];
+  const flash  = d.flashcards    ||[];
+  const casos  = d.casos         ||[];
+  const simI   = d.simINFOTEC    ||[];
+  const simAWS = d.simulacrosAWS ||[];
+  const dudas  = d.dudas         ||[];
 
-  const puntajes=rows.map(r=>pctNum(r['Puntaje']));
-  const prom=(puntajes.reduce((a,b)=>a+b,0)/puntajes.length).toFixed(0);
-  setText('s-prom-casos',prom+'%');
+  // ── STATS ──
+  const unicos=new Set(asist.map(r=>String(r['Correo']||'').toLowerCase()));
+  setText('s-estudiantes',unicos.size);
+  setText('s-asistencia',asist.length);
+  setText('s-flashcards',flash.length);
+  setText('s-casos',casos.length);
+  setText('s-sim-infotec',simI.length);
+  setText('s-simulacros',simAWS.length);
+  setText('s-dudas',dudas.length);
 
-  const rangos={'0–20':0,'21–40':0,'41–60':0,'61–80':0,'81–100':0};
-  puntajes.forEach(p=>{
-    if(p<=20)rangos['0–20']++;
-    else if(p<=40)rangos['21–40']++;
-    else if(p<=60)rangos['41–60']++;
-    else if(p<=80)rangos['61–80']++;
-    else rangos['81–100']++;
-  });
-  makeBarChart('chart-casos',Object.keys(rangos),Object.values(rangos),'#8b5cf6','Estudiantes');
+  if(casos.length){
+    const ps=casos.map(r=>pct(r['Puntaje']));
+    setText('s-prom-casos',(ps.reduce((a,b)=>a+b,0)/ps.length).toFixed(0)+'%');
+  }else setText('s-prom-casos','—');
 
-  const casosBarras=document.getElementById('casos-barras');
-  if(casosBarras){
-    const maxR=rows.length;
-    casosBarras.innerHTML='';
+  // ── ASISTENCIA POR DÍA ──
+  const{labels,data}=countByDate(asist);
+  setText('badge-asistencia',asist.length+' registros');
+  makeBar('chart-asistencia',labels,data,'#3b82f6','Entradas');
+
+  // ── SEMÁFORO ──
+  calcularSemaforo(asist,flash,casos,simI);
+
+  // ── ACTIVIDAD DOUGHNUT ──
+  makeDoughnut('chart-actividad',
+    ['Entradas','Flashcards','Casos','Sim. INFOTEC','Sim. AWS','Dudas'],
+    [asist.length,flash.length,casos.length,simI.length,simAWS.length,dudas.length],
+    ['#3b82f6','#10b981','#8b5cf6','#14b8a6','#f59e0b','#ef4444']);
+
+  // ── FLASHCARDS POR SESIÓN ──
+  const s1=flash.filter(r=>String(r['Sesion']||'').toLowerCase().includes('1')).length;
+  const s2=flash.filter(r=>String(r['Sesion']||'').toLowerCase().includes('2')).length;
+  const s3=flash.filter(r=>String(r['Sesion']||'').toLowerCase().includes('3')).length;
+  const maxF=Math.max(s1,s2,s3,1);
+  const fsEl=document.getElementById('flash-sesiones');
+  if(fsEl)fsEl.innerHTML=[
+    {label:'Sesión 1',n:s1,cls:'s1-tag',c:'#3b82f6'},
+    {label:'Sesión 2',n:s2,cls:'s2-tag',c:'#ef4444'},
+    {label:'Sesión 3',n:s3,cls:'s3-tag',c:'#10b981'},
+  ].map(s=>`<div class="sesion-row">
+    <span class="sesion-tag ${s.cls}">${s.label}</span>
+    <div class="prog-track" style="flex:1"><div class="prog-fill" style="width:${Math.round(s.n/maxF*100)}%;background:${s.c}"></div></div>
+    <div class="prog-val">${s.n}</div>
+  </div>`).join('');
+
+  // ── CASOS: DISTRIBUCIÓN ──
+  if(casos.length){
+    const ps=casos.map(r=>pct(r['Puntaje']));
+    const rangos={'0–20':0,'21–40':0,'41–60':0,'61–80':0,'81–100':0};
+    ps.forEach(p=>{if(p<=20)rangos['0–20']++;else if(p<=40)rangos['21–40']++;else if(p<=60)rangos['41–60']++;else if(p<=80)rangos['61–80']++;else rangos['81–100']++;});
+    makeBar('chart-casos',Object.keys(rangos),Object.values(rangos),'#8b5cf6','Estudiantes');
+  }
+
+  // ── CASOS: BARRAS POR CASO ──
+  const cbEl=document.getElementById('casos-barras');
+  if(cbEl&&casos.length){
+    cbEl.innerHTML='';
     for(let i=1;i<=10;i++){
-      const key='Caso'+i;
-      const ok=rows.filter(r=>(r[key]||'').trim()==='✓').length;
-      const pct=maxR>0?Math.round(ok/maxR*100):0;
-      const fc=pct>=70?'#10b981':pct>=50?'#f59e0b':'#ef4444';
-      casosBarras.innerHTML+=`<div class="prog-row">
+      const ok=casos.filter(r=>String(r['Caso'+i]||'').trim()==='✓').length;
+      const p=Math.round(ok/casos.length*100);
+      const fc=p>=70?'#10b981':p>=50?'#f59e0b':'#ef4444';
+      cbEl.innerHTML+=`<div class="prog-row">
         <div class="prog-label">Caso ${i}</div>
-        <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${fc}"></div></div>
-        <div class="prog-val">${pct}%</div>
+        <div class="prog-track"><div class="prog-fill" style="width:${p}%;background:${fc}"></div></div>
+        <div class="prog-val">${p}%</div>
       </div>`;
     }
   }
-  return rows.length;
-}
 
-// ── CARGAR SIMULACRO INFOTEC ─────────────────────────────────
-async function cargarSimulacroINFOTEC(){
-  let rows=[];
-  try{rows=await parseCSV(SHEETS.simINFOTEC);}catch(e){return 0;}
-  setText('s-sim-infotec',rows.length);
-  setText('badge-sim-infotec',rows.length+' registros');
-  _datosGlobales.simINFOTEC=rows;
-  if(!rows.length)return 0;
+  // ── SIMULACRO INFOTEC ──
+  setText('badge-sim-infotec',simI.length+' registros');
+  if(simI.length){
+    const ps=simI.map(r=>pct(r['Puntaje']));
+    const rangos={'0–20':0,'21–40':0,'41–60':0,'61–80':0,'81–100':0};
+    ps.forEach(p=>{if(p<=20)rangos['0–20']++;else if(p<=40)rangos['21–40']++;else if(p<=60)rangos['41–60']++;else if(p<=80)rangos['61–80']++;else rangos['81–100']++;});
+    makeBar('chart-sim-infotec',Object.keys(rangos),Object.values(rangos),'#14b8a6','Estudiantes');
 
-  const puntajes=rows.map(r=>pctNum(r['Puntaje']));
-  const rangos={'0–20':0,'21–40':0,'41–60':0,'61–80':0,'81–100':0};
-  puntajes.forEach(p=>{
-    if(p<=20)rangos['0–20']++;
-    else if(p<=40)rangos['21–40']++;
-    else if(p<=60)rangos['41–60']++;
-    else if(p<=80)rangos['61–80']++;
-    else rangos['81–100']++;
-  });
-  makeBarChart('chart-sim-infotec',Object.keys(rangos),Object.values(rangos),'#14b8a6','Estudiantes');
+    [['PuntajeD1','d1','#3b82f6'],['PuntajeD2','d2','#ef4444'],['PuntajeD3','d3','#10b981'],['PuntajeD4','d4','#f59e0b']].forEach(([col,id,c])=>{
+      const vs=simI.map(r=>pct(r[col]));
+      const avg=vs.length?Math.round(vs.reduce((a,b)=>a+b,0)/vs.length):0;
+      const fill=document.getElementById(id+'-fill'), val=document.getElementById(id+'-val');
+      if(fill){fill.style.width=avg+'%';fill.style.background=c;}
+      if(val)val.textContent=avg+'%';
+    });
 
-  // Promedios por dominio
-  const ds=['D1','D2','D3','D4'];
-  const cols=['PuntajeD1','PuntajeD2','PuntajeD3','PuntajeD4'];
-  const colors=['#3b82f6','#ef4444','#10b981','#f59e0b'];
-  ds.forEach((d,i)=>{
-    const vals=rows.map(r=>pctNum(r[cols[i]]));
-    const avg=vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;
-    const fill=document.getElementById(d.toLowerCase()+'-fill');
-    const val=document.getElementById(d.toLowerCase()+'-val');
-    if(fill)fill.style.width=avg+'%';
-    if(fill)fill.style.background=colors[i];
-    if(val)val.textContent=avg+'%';
-  });
-
-  // Tabla últimos 8
-  const last8=rows.slice(-8).reverse();
-  const tablaEl=document.getElementById('tabla-sim-infotec');
-  if(tablaEl){
-    tablaEl.innerHTML=`<table class="data-table">
-      <thead><tr><th>Nombre</th><th>Puntaje</th><th>D1</th><th>D2</th><th>D3</th><th>D4</th><th>Tiempo</th><th>Fecha</th></tr></thead>
-      <tbody>${last8.map(r=>{
-        const p=pctNum(r['Puntaje']);
-        return`<tr>
-          <td>${(r['Nombre']||'')} ${(r['Apellido']||'')}</td>
+    const tEl=document.getElementById('tabla-sim-infotec');
+    if(tEl){
+      const last=simI.slice(-8).reverse();
+      tEl.innerHTML=`<table class="data-table">
+        <thead><tr><th>Nombre</th><th>Puntaje</th><th>D1</th><th>D2</th><th>D3</th><th>D4</th><th>Tiempo</th><th>Fecha</th></tr></thead>
+        <tbody>${last.map(r=>{const p=pct(r['Puntaje']);return`<tr>
+          <td>${r['Nombre']||''} ${r['Apellido']||''}</td>
           <td><span class="score-badge ${scoreClass(p)}">${p}%</span></td>
           <td>${r['PuntajeD1']||'—'}</td><td>${r['PuntajeD2']||'—'}</td>
           <td>${r['PuntajeD3']||'—'}</td><td>${r['PuntajeD4']||'—'}</td>
           <td>${r['TiempoMin']?r['TiempoMin']+' min':'—'}</td>
-          <td style="font-family:'JetBrains Mono',monospace;font-size:11px">${(r['Fecha']||'—').split(',')[0]}</td>
-        </tr>`;
-      }).join('')}</tbody>
-    </table>`;
+          <td style="font-family:'JetBrains Mono',monospace;font-size:11px">${String(r['Fecha']||'—').split(',')[0]}</td>
+        </tr>`;}).join('')}</tbody>
+      </table>`;
+    }
   }
-  return rows.length;
-}
 
-// ── CARGAR SIMULACROS AWS ────────────────────────────────────
-async function cargarSimulacros(){
-  const rows=await parseCSV(SHEETS.simulacros);
-  setText('s-simulacros',rows.length);
-  setText('badge-sim',rows.length+' registros');
-  _datosGlobales.simulacrosAWS=rows;
-  if(!rows.length)return 0;
-  const tipos={};
-  rows.forEach(r=>{
-    const t=(r['Simulacro']||'Sin tipo').trim();
-    if(!tipos[t])tipos[t]=[];
-    tipos[t].push(pctNum(r['Puntaje']));
-  });
-  const labels=Object.keys(tipos);
-  const promedios=labels.map(t=>{const a=tipos[t];return(a.reduce((x,y)=>x+y,0)/a.length).toFixed(1);});
-  makeBarChart('chart-simulacros',labels.map(l=>l.length>28?l.substring(0,28)+'…':l),promedios,'#f59e0b','Promedio');
-  const last8=rows.slice(-8).reverse();
-  const tablaEl=document.getElementById('tabla-simulacros');
-  if(tablaEl){
-    tablaEl.innerHTML=`<table class="data-table">
-      <thead><tr><th>Nombre</th><th>Simulacro</th><th>Puntaje</th><th>Fecha</th></tr></thead>
-      <tbody>${last8.map(r=>{
-        const p=pctNum(r['Puntaje']);
-        const sim=(r['Simulacro']||'—').replace('(BenchPrep)','').trim();
-        return`<tr>
-          <td>${(r['Nombre']||'')} ${(r['Apellido']||'')}</td>
+  // ── SIMULACROS AWS ──
+  setText('badge-sim',simAWS.length+' registros');
+  if(simAWS.length){
+    const tipos={};
+    simAWS.forEach(r=>{const t=(r['Simulacro']||'Sin tipo').trim();if(!tipos[t])tipos[t]=[];tipos[t].push(pct(r['Puntaje']));});
+    const labs=Object.keys(tipos), proms=labs.map(t=>{const a=tipos[t];return(a.reduce((x,y)=>x+y,0)/a.length).toFixed(1);});
+    makeBar('chart-simulacros',labs.map(l=>l.length>28?l.substring(0,28)+'…':l),proms,'#f59e0b','Promedio');
+    const tEl=document.getElementById('tabla-simulacros');
+    if(tEl){
+      const last=simAWS.slice(-8).reverse();
+      tEl.innerHTML=`<table class="data-table">
+        <thead><tr><th>Nombre</th><th>Simulacro</th><th>Puntaje</th><th>Fecha</th></tr></thead>
+        <tbody>${last.map(r=>{const p=pct(r['Puntaje']);const sim=(r['Simulacro']||'—').replace('(BenchPrep)','').trim();return`<tr>
+          <td>${r['Nombre']||''} ${r['Apellido']||''}</td>
           <td>${sim}</td>
           <td><span class="score-badge ${scoreClass(p)}">${p}</span></td>
-          <td>${(r['Fecha Realizacion']||r['Fecha Realización']||'—').trim()}</td>
-        </tr>`;
-      }).join('')}</tbody>
-    </table>`;
+          <td>${String(r['Fecha Realizacion']||r['Fecha Realización']||'—').trim()}</td>
+        </tr>`;}).join('')}</tbody>
+      </table>`;
+    }
   }
-  return rows.length;
+
+  // ── DUDAS ──
+  setText('badge-dudas',dudas.length+' dudas');
+  const dEl=document.getElementById('dudas-list');
+  if(dEl){
+    if(!dudas.length){dEl.innerHTML='<div class="empty">Sin dudas registradas aún</div>';}
+    else{
+      dEl.innerHTML=dudas.slice(-10).reverse().map(r=>`
+        <div class="duda-item">
+          <div class="duda-meta">
+            <span class="duda-name">${r['Nombre']||''} ${r['Apellido']||''}</span>
+            <span class="duda-date">${String(r['Fecha']||'').split(',')[0]}</span>
+          </div>
+          <div class="duda-text">${r['Duda']||'—'}</div>
+        </div>`).join('');
+    }
+  }
 }
 
-// ── CARGAR DUDAS ─────────────────────────────────────────────
-async function cargarDudas(){
-  const rows=await parseCSV(SHEETS.dudas);
-  setText('s-dudas',rows.length);
-  setText('badge-dudas',rows.length+' dudas');
-  const el=document.getElementById('dudas-list');
-  if(!rows.length){if(el)el.innerHTML='<div class="empty">Sin dudas registradas aún</div>';return 0;}
-  const last10=rows.slice(-10).reverse();
-  if(el)el.innerHTML=last10.map(r=>`
-    <div class="duda-item">
-      <div class="duda-meta">
-        <span class="duda-name">${r['Nombre']||''} ${r['Apellido']||''}</span>
-        <span class="duda-date">${(r['Fecha']||'').trim()}</span>
-      </div>
-      <div class="duda-text">${r['Duda']||'—'}</div>
-    </div>`).join('');
-  return rows.length;
-}
-
-// ── CALCULAR SEMÁFORO ────────────────────────────────────────
-function calcularSemaforo(asistencia,flashcards,casos,simINFOTEC){
-  const correosAsist=new Set((asistencia||[]).map(r=>norm(r['Correo'])));
-  const correosFlash=new Set((flashcards||[]).map(r=>norm(r['Correo'])));
-  const correosCasos=new Set((casos||[]).map(r=>norm(r['Correo'])));
-
-  // Mejor puntaje de simulacro por correo
+// ── SEMÁFORO ─────────────────────────────────────────────────
+function calcularSemaforo(asist,flash,casos,simI){
+  const corrFlash=new Set(flash.map(r=>String(r['Correo']||'').toLowerCase()));
+  const corrCasos=new Set(casos.map(r=>String(r['Correo']||'').toLowerCase()));
   const simMap={};
-  (simINFOTEC||[]).forEach(r=>{
-    const c=norm(r['Correo']);
-    const p=pctNum(r['Puntaje']);
-    if(!simMap[c]||p>simMap[c])simMap[c]=p;
-  });
+  simI.forEach(r=>{const c=String(r['Correo']||'').toLowerCase(),p=pct(r['Puntaje']);if(!simMap[c]||p>simMap[c])simMap[c]=p;});
 
   let azul=0,verde=0,amarillo=0,rojo=0,gris=0;
-  correosAsist.forEach(c=>{
-    const tieneFlash=correosFlash.has(c);
-    const tieneCasos=correosCasos.has(c);
-    const sim=simMap[c]||0;
-    const tieneActividad=tieneFlash||tieneCasos||sim>0;
-    if(sim>=80)azul++;
-    else if(sim>=70)verde++;
-    else if(tieneActividad&&sim>0)amarillo++;
-    else if(tieneActividad)rojo++;
+  const vistos=new Set();
+  asist.forEach(r=>{
+    const c=String(r['Correo']||'').toLowerCase();
+    if(!c||vistos.has(c))return;
+    vistos.add(c);
+    const tieneAct=corrFlash.has(c)||corrCasos.has(c)||(simMap[c]>0);
+    const s=simMap[c]||0;
+    if(s>=80)azul++;
+    else if(s>=70)verde++;
+    else if(tieneAct&&s>0)amarillo++;
+    else if(tieneAct)rojo++;
     else gris++;
   });
 
   setText('sem-azul',azul);setText('sem-verde',verde);
   setText('sem-amarillo',amarillo);setText('sem-rojo',rojo);setText('sem-gris',gris);
-  setText('badge-semaforo',correosAsist.size+' estudiantes');
-
-  _datosGlobales.semaforo={azul,verde,amarillo,rojo,gris,total:correosAsist.size};
-}
-
-// ── ACTIVIDAD DOUGHNUT ───────────────────────────────────────
-function cargarActividad(totales){
-  makeDoughnut('chart-actividad',
-    ['Entradas','Flashcards','Casos','Sim. INFOTEC','Sim. AWS','Dudas'],
-    totales,['#3b82f6','#10b981','#8b5cf6','#14b8a6','#f59e0b','#ef4444']);
-}
-
-// ── CARGAR TODO ──────────────────────────────────────────────
-async function cargarTodo(){
-  const btn=document.getElementById('refresh-btn');
-  btn.classList.add('loading');btn.textContent='⟳ Cargando…';
-  try{
-    const[asistRes,f,c,si,s,d]=await Promise.all([
-      cargarAsistencia().catch(()=>({total:0,unicos:new Set()})),
-      cargarFlashcards().catch(()=>0),
-      cargarCasos().catch(()=>0),
-      cargarSimulacroINFOTEC().catch(()=>0),
-      cargarSimulacros().catch(()=>0),
-      cargarDudas().catch(()=>0),
-    ]);
-    calcularSemaforo(
-      _datosGlobales.asistencia,
-      _datosGlobales.flashcards,
-      _datosGlobales.casos,
-      _datosGlobales.simINFOTEC
-    );
-    cargarActividad([asistRes.total||asistRes,f,c,si,s,d]);
-    const now=new Date().toLocaleString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
-    setText('last-update','Actualizado: '+now);
-  }catch(e){console.error(e);}
-  btn.classList.remove('loading');btn.textContent='⟳ Actualizar datos';
-}
-
-// ── ACCIONES — CORREOS ───────────────────────────────────────
-async function ejecutarAccion(accion,btnId){
-  const btn=document.getElementById(btnId);
-  const msg=document.getElementById('act-msg');
-  if(btn)btn.disabled=true;
-  if(msg)msg.textContent='⏳ Enviando…';
-  try{
-    await fetch(`${SCRIPT_URL}?accion=${accion}`,{method:'GET',mode:'no-cors'});
-    if(msg)msg.textContent='✅ Enviado correctamente';
-  }catch(e){
-    if(msg)msg.textContent='✅ Solicitud enviada';
-  }
-  setTimeout(()=>{if(msg)msg.textContent='';},5000);
-  if(btn)btn.disabled=false;
+  setText('badge-semaforo',vistos.size+' estudiantes');
 }
 
 // ── PDF EJECUTIVO ────────────────────────────────────────────
-function generarPDFEjecutivo(){
-  const btn=document.getElementById('btn-pdf');
+function generarPDF(){
+  const btn=document.getElementById('pdf-btn');
   btn.disabled=true;btn.textContent='⏳ Generando…';
   try{
     const{jsPDF}=window.jspdf;
     const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
     const W=210,M=15,CW=W-M*2;
-    const F=(sz,bold,rgb)=>{doc.setFontSize(sz);doc.setFont('helvetica',bold?'bold':'normal');doc.setTextColor(...(rgb||[30,41,59]));};
+    const F=(sz,b,rgb)=>{doc.setFontSize(sz);doc.setFont('helvetica',b?'bold':'normal');doc.setTextColor(...(rgb||[30,41,59]));};
     const R=(x,y,w,h,rgb)=>{doc.setFillColor(...rgb);doc.rect(x,y,w,h,'F');};
-    const T=(t,x,y,opts)=>{doc.text(String(t),x,y,opts||{});};
+    const T=(t,x,y,o)=>doc.text(String(t),x,y,o||{});
     const now=new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric'});
-    const g=_datosGlobales;
-    const sem=g.semaforo||{azul:0,verde:0,amarillo:0,rojo:0,gris:0,total:0};
+    const d=_cache;
 
-    // Portada
-    R(0,0,W,55,[30,64,175]);
-    R(0,51,W,4,[99,102,241]);
+    R(0,0,W,55,[30,64,175]);R(0,51,W,4,[99,102,241]);
     F(8,false,[165,180,252]);T('INFOTEC  |  TUTORÍA AWS CLOUD PRACTITIONER  |  CLF-C02',M,12);
     F(18,true,[255,255,255]);T('Reporte ejecutivo de seguimiento',M,28);
     F(10,false,[147,197,253]);T('Preparación para la certificación AWS Cloud Practitioner',M,40);
     F(8,false,[147,197,253]);T('Tutora: Iliana Lizbeth Alvarado Lara  ·  Generado: '+now,M,52);
 
     let y=68;
-    // Resumen
-    F(10,true,[71,85,105]);T('RESUMEN GENERAL',M,y);y+=6;
-    R(M,y,CW,1,[226,232,240]);y+=5;
-    const stats=[
-      ['Estudiantes registrados',(g.estudiantesUnicos||'—')],
-      ['Entradas al sitio',(g.asistencia||[]).length],
-      ['Sesiones de flashcards',(g.flashcards||[]).length],
-      ['Casos de uso completados',(g.casos||[]).length],
-      ['Simulacros INFOTEC',(g.simINFOTEC||[]).length],
-      ['Simulacros AWS oficiales',(g.simulacrosAWS||[]).length],
-    ];
-    stats.forEach(([k,v])=>{
-      F(9,false,[30,41,59]);T(k,M+4,y);
-      F(9,true,[37,99,235]);T(String(v),W-M-4,y,{align:'right'});
-      y+=7;
-    });
+    F(10,true,[71,85,105]);T('RESUMEN GENERAL',M,y);y+=5;
+    R(M,y,CW,0.5,[226,232,240]);y+=5;
 
-    y+=4;
-    F(10,true,[71,85,105]);T('SEMÁFORO DE PREPARACIÓN',M,y);y+=6;
-    R(M,y,CW,1,[226,232,240]);y+=5;
-    const semRows=[
-      ['🔵 Listos para el examen (simulacro ≥ 80%)',sem.azul,[37,99,235]],
-      ['🟢 Buen avance (simulacro 70–79%)',sem.verde,[5,150,105]],
-      ['🟡 En proceso (con actividad, sim < 70%)',sem.amarillo,[217,119,6]],
-      ['🔴 En riesgo (actividad pero sin simulacro)',sem.rojo,[220,38,38]],
-      ['⚪ Sin actividad adicional al registro',sem.gris,[107,114,128]],
-    ];
-    semRows.forEach(([k,v,c])=>{
-      F(9,false,c);T(k,M+4,y);
-      F(9,true,c);T(String(v),W-M-4,y,{align:'right'});
-      y+=7;
-    });
+    const asist=d.asistencia||[], flash=d.flashcards||[], casos=d.casos||[], simI=d.simINFOTEC||[];
+    const unicos=new Set(asist.map(r=>String(r['Correo']||'').toLowerCase())).size;
+    const stats=[['Estudiantes únicos registrados',unicos],['Registros de entrada al sitio',asist.length],['Sesiones de flashcards',flash.length],['Casos de uso completados',casos.length],['Simulacros INFOTEC realizados',simI.length],['Simulacros AWS oficiales',(d.simulacrosAWS||[]).length],['Dudas enviadas',(d.dudas||[]).length]];
+    stats.forEach(([k,v])=>{F(9,false,[30,41,59]);T(k,M+4,y);F(9,true,[37,99,235]);T(String(v),W-M-4,y,{align:'right'});y+=7;});
 
-    // Pie
+    y+=5;F(10,true,[71,85,105]);T('SEMÁFORO DE PREPARACIÓN',M,y);y+=5;
+    R(M,y,CW,0.5,[226,232,240]);y+=5;
+
+    const sem={azul:parseInt(document.getElementById('sem-azul').textContent)||0,verde:parseInt(document.getElementById('sem-verde').textContent)||0,amarillo:parseInt(document.getElementById('sem-amarillo').textContent)||0,rojo:parseInt(document.getElementById('sem-rojo').textContent)||0,gris:parseInt(document.getElementById('sem-gris').textContent)||0};
+    [['🔵 Listos para el examen (simulacro ≥ 80%)',sem.azul,[37,99,235]],['🟢 Buen avance (simulacro 70–79%)',sem.verde,[5,150,105]],['🟡 En proceso (con actividad, sim < 70%)',sem.amarillo,[217,119,6]],['🔴 En riesgo (actividad sin simulacro)',sem.rojo,[220,38,38]],['⚪ Sin actividad adicional al registro',sem.gris,[107,114,128]]].forEach(([k,v,c])=>{F(9,false,c);T(k,M+4,y);F(9,true,c);T(String(v),W-M-4,y,{align:'right'});y+=7;});
+
     R(0,280,W,17,[30,64,175]);
     F(7,false,[165,180,252]);T('INFOTEC  |  Tutoría AWS Cloud Practitioner  |  Iliana Lizbeth Alvarado Lara  |  '+now,M,288);
     doc.text('1/1',W-M,288,{align:'right'});
-
-    doc.save('Reporte-Ejecutivo-CLF-C02-'+now.replace(/\//g,'-')+'.pdf');
-  }catch(e){alert('Error: '+e.message);}
-  btn.disabled=false;btn.textContent='📄 Descargar PDF ejecutivo';
+    doc.save('Reporte-CLF-C02-'+now.replace(/\//g,'-')+'.pdf');
+  }catch(e){alert('Error al generar PDF: '+e.message);}
+  btn.disabled=false;btn.textContent='📄 PDF ejecutivo';
 }
 
-// Cargar al inicio
 cargarTodo();
 </script>
 </body>
