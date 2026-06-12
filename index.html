@@ -15,9 +15,10 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
 /* HEADER */
 .header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;gap:20px;flex-wrap:wrap}
+.header-left{flex:1;text-align:center}
 .header-tag{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--blue);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}
-.header-title{font-size:clamp(22px,3.5vw,32px);font-weight:700;color:var(--text);line-height:1.1;letter-spacing:-.02em}
-.header-title span{color:var(--blue)}
+.header-title{font-size:clamp(22px,3.5vw,32px);font-weight:700;color:#000;line-height:1.1;letter-spacing:-.02em}
+.header-title span{color:#000}
 .header-sub{font-size:13px;color:var(--text2);margin-top:6px}
 .header-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
 .refresh-btn{display:inline-flex;align-items:center;gap:7px;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:9px 18px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.07)}
@@ -117,7 +118,7 @@ canvas{max-height:200px}
 
   <!-- HEADER -->
   <div class="header">
-    <div>
+    <div class="header-left">
       <div class="header-tag">INFOTEC · CLF-C02 · 2026</div>
       <div class="header-title">Dashboard de <span>seguimiento</span></div>
       <div class="header-sub">Tutoría AWS Cloud Practitioner · Iliana Lizbeth Alvarado Lara</div>
@@ -139,7 +140,6 @@ canvas{max-height:200px}
     <div class="stat-card blue"><div class="stat-icon">📋</div><div class="stat-n" id="s-asistencia">—</div><div class="stat-label">Registros de entrada</div></div>
     <div class="stat-card green"><div class="stat-icon">🃏</div><div class="stat-n" id="s-flashcards">—</div><div class="stat-label">Sesiones flashcards</div></div>
     <div class="stat-card purple"><div class="stat-icon">✅</div><div class="stat-n" id="s-casos">—</div><div class="stat-label">Casos completados</div></div>
-    <div class="stat-card teal"><div class="stat-icon">📊</div><div class="stat-n" id="s-prom-casos">—</div><div class="stat-label">Prom. casos de uso</div></div>
     <div class="stat-card teal"><div class="stat-icon">📝</div><div class="stat-n" id="s-sim-infotec">—</div><div class="stat-label">Simulacros INFOTEC</div></div>
     <div class="stat-card amber"><div class="stat-icon">🎯</div><div class="stat-n" id="s-simulacros">—</div><div class="stat-label">Simulacros AWS</div></div>
     <div class="stat-card red"><div class="stat-icon">❓</div><div class="stat-n" id="s-dudas">—</div><div class="stat-label">Dudas enviadas</div></div>
@@ -157,99 +157,62 @@ canvas{max-height:200px}
     </div>
     <div class="panel">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-dot dot-teal"></div>Semáforo de preparación</div>
-        <div class="panel-badge" id="badge-semaforo">—</div>
-      </div>
-      <div class="semaforo-grid">
-        <div class="sem-card azul"><div class="sem-emoji">🔵</div><div class="sem-n" id="sem-azul">—</div><div class="sem-label">Listo</div></div>
-        <div class="sem-card verde"><div class="sem-emoji">🟢</div><div class="sem-n" id="sem-verde">—</div><div class="sem-label">Buen avance</div></div>
-        <div class="sem-card amarillo"><div class="sem-emoji">🟡</div><div class="sem-n" id="sem-amarillo">—</div><div class="sem-label">En proceso</div></div>
-        <div class="sem-card rojo"><div class="sem-emoji">🔴</div><div class="sem-n" id="sem-rojo">—</div><div class="sem-label">En riesgo</div></div>
-        <div class="sem-card gris"><div class="sem-emoji">⚪</div><div class="sem-n" id="sem-gris">—</div><div class="sem-label">Sin actividad</div></div>
-      </div>
-      <div class="sem-desc">🔵 Sim. ≥80% · 🟢 70–79% · 🟡 Con actividad, sim &lt;70% · 🔴 Actividad sin simulacro · ⚪ Solo registro de entrada</div>
-    </div>
-  </div>
-
-  <div class="panels-2">
-    <div class="panel">
-      <div class="panel-header">
         <div class="panel-title"><div class="panel-dot dot-blue"></div>Actividad acumulada</div>
       </div>
       <canvas id="chart-actividad"></canvas>
     </div>
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title"><div class="panel-dot dot-green"></div>Flashcards por sesión</div>
-      </div>
-      <div id="flash-sesiones"><div class="empty">Sin datos</div></div>
+    <!-- Semáforo oculto, preservado para activación futura -->
+    <div style="display:none">
+      <div id="badge-semaforo"></div>
+      <div id="sem-azul"></div><div id="sem-verde"></div>
+      <div id="sem-amarillo"></div><div id="sem-rojo"></div><div id="sem-gris"></div>
     </div>
   </div>
 
   <!-- CASOS DE USO -->
   <div class="section-div">Casos de uso</div>
   <div class="panels-2">
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title"><div class="panel-dot dot-purple"></div>Distribución de puntajes</div>
-      </div>
-      <canvas id="chart-casos"></canvas>
-    </div>
-    <div class="panel">
+    <div class="panel panel-full">
       <div class="panel-header">
         <div class="panel-title"><div class="panel-dot dot-purple"></div>Aciertos por caso (% del grupo)</div>
+        <div class="panel-badge" id="badge-casos-total">—</div>
       </div>
       <div id="casos-barras"><div class="empty">Sin datos</div></div>
+    </div>
+  </div>
+
+  <!-- FLASHCARDS -->
+  <div class="section-div">Flashcards</div>
+  <div class="panels-2">
+    <div class="panel panel-full">
+      <div class="panel-header">
+        <div class="panel-title"><div class="panel-dot dot-green"></div>Interacciones por día</div>
+        <div class="panel-badge" id="badge-flash-gen">—</div>
+      </div>
+      <canvas id="chart-flash-gen"></canvas>
     </div>
   </div>
 
   <!-- SIMULACRO INFOTEC -->
   <div class="section-div">Simulacro INFOTEC — 65 preguntas</div>
   <div class="panels-2">
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title"><div class="panel-dot dot-teal"></div>Distribución de puntajes</div>
-        <div class="panel-badge" id="badge-sim-infotec">—</div>
-      </div>
-      <canvas id="chart-sim-infotec"></canvas>
-    </div>
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title"><div class="panel-dot dot-teal"></div>Promedio por dominio</div>
-      </div>
-      <div>
-        <div class="prog-row"><div class="prog-label">D1 · Conceptos</div><div class="prog-track"><div class="prog-fill" id="d1-fill" style="width:0%;background:#3b82f6"></div></div><div class="prog-val" id="d1-val">—</div></div>
-        <div class="prog-row"><div class="prog-label">D2 · Seguridad</div><div class="prog-track"><div class="prog-fill" id="d2-fill" style="width:0%;background:#ef4444"></div></div><div class="prog-val" id="d2-val">—</div></div>
-        <div class="prog-row"><div class="prog-label">D3 · Tecnología</div><div class="prog-track"><div class="prog-fill" id="d3-fill" style="width:0%;background:#10b981"></div></div><div class="prog-val" id="d3-val">—</div></div>
-        <div class="prog-row"><div class="prog-label">D4 · Facturación</div><div class="prog-track"><div class="prog-fill" id="d4-fill" style="width:0%;background:#f59e0b"></div></div><div class="prog-val" id="d4-val">—</div></div>
-        <div style="margin-top:14px;font-size:11px;color:var(--text3)">D1 24% · D2 30% · D3 34% · D4 12%</div>
-      </div>
-    </div>
-  </div>
-  <div class="panels-2">
     <div class="panel panel-full">
       <div class="panel-header">
-        <div class="panel-title"><div class="panel-dot dot-teal"></div>Últimos resultados — Simulacro INFOTEC</div>
+        <div class="panel-title"><div class="panel-dot dot-teal"></div>Promedio general del grupo</div>
+        <div class="panel-badge" id="badge-sim-infotec">—</div>
       </div>
-      <div id="tabla-sim-infotec"><div class="empty">Sin datos aún</div></div>
+      <canvas id="chart-sim-infotec" style="max-height:260px"></canvas>
     </div>
   </div>
-
   <!-- SIMULACROS AWS -->
   <div class="section-div">Simulacros oficiales AWS (BenchPrep)</div>
   <div class="panels-2">
-    <div class="panel">
+    <div class="panel panel-full">
       <div class="panel-header">
         <div class="panel-title"><div class="panel-dot dot-amber"></div>Puntajes por simulacro</div>
-      </div>
-      <canvas id="chart-simulacros"></canvas>
-    </div>
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title"><div class="panel-dot dot-amber"></div>Últimos resultados</div>
         <div class="panel-badge" id="badge-sim">—</div>
       </div>
-      <div id="tabla-simulacros"><div class="empty">Sin datos aún</div></div>
+      <canvas id="chart-simulacros"></canvas>
     </div>
   </div>
 
@@ -384,31 +347,8 @@ function procesarDatos(d){
     [asist.length,flash.length,casos.length,simI.length,simAWS.length,dudas.length],
     ['#3b82f6','#10b981','#8b5cf6','#14b8a6','#f59e0b','#ef4444']);
 
-  // ── FLASHCARDS POR SESIÓN ──
-  const s1=flash.filter(r=>String(r['Sesion']||'').toLowerCase().includes('1')).length;
-  const s2=flash.filter(r=>String(r['Sesion']||'').toLowerCase().includes('2')).length;
-  const s3=flash.filter(r=>String(r['Sesion']||'').toLowerCase().includes('3')).length;
-  const maxF=Math.max(s1,s2,s3,1);
-  const fsEl=document.getElementById('flash-sesiones');
-  if(fsEl)fsEl.innerHTML=[
-    {label:'Sesión 1',n:s1,cls:'s1-tag',c:'#3b82f6'},
-    {label:'Sesión 2',n:s2,cls:'s2-tag',c:'#ef4444'},
-    {label:'Sesión 3',n:s3,cls:'s3-tag',c:'#10b981'},
-  ].map(s=>`<div class="sesion-row">
-    <span class="sesion-tag ${s.cls}">${s.label}</span>
-    <div class="prog-track" style="flex:1"><div class="prog-fill" style="width:${Math.round(s.n/maxF*100)}%;background:${s.c}"></div></div>
-    <div class="prog-val">${s.n}</div>
-  </div>`).join('');
-
-  // ── CASOS: DISTRIBUCIÓN ──
-  if(casos.length){
-    const ps=casos.map(r=>pct(r['Puntaje']));
-    const rangos={'0–20':0,'21–40':0,'41–60':0,'61–80':0,'81–100':0};
-    ps.forEach(p=>{if(p<=20)rangos['0–20']++;else if(p<=40)rangos['21–40']++;else if(p<=60)rangos['41–60']++;else if(p<=80)rangos['61–80']++;else rangos['81–100']++;});
-    makeBar('chart-casos',Object.keys(rangos),Object.values(rangos),'#8b5cf6','Estudiantes');
-  }
-
-  // ── CASOS: BARRAS POR CASO ──
+  // ── CASOS: BARRAS POR CASO (todos) ──
+  setText('badge-casos-total', casos.length+' registros');
   const cbEl=document.getElementById('casos-barras');
   if(cbEl&&casos.length){
     cbEl.innerHTML='';
@@ -424,37 +364,26 @@ function procesarDatos(d){
     }
   }
 
+  // ── FLASHCARDS: INTERACCIONES POR DÍA ──
+  setText('badge-flash-gen', flash.length+' registros');
+  if(flash.length){
+    const {labels:fLabels, data:fData} = countByDate(flash);
+    makeBar('chart-flash-gen', fLabels, fData, '#10b981', 'Estudiantes');
+  }
+
   // ── SIMULACRO INFOTEC ──
   setText('badge-sim-infotec',simI.length+' registros');
   if(simI.length){
-    const ps=simI.map(r=>pct(r['Puntaje']));
-    const rangos={'0–20':0,'21–40':0,'41–60':0,'61–80':0,'81–100':0};
-    ps.forEach(p=>{if(p<=20)rangos['0–20']++;else if(p<=40)rangos['21–40']++;else if(p<=60)rangos['41–60']++;else if(p<=80)rangos['61–80']++;else rangos['81–100']++;});
-    makeBar('chart-sim-infotec',Object.keys(rangos),Object.values(rangos),'#14b8a6','Estudiantes');
-
-    [['PuntajeD1','d1','#3b82f6'],['PuntajeD2','d2','#ef4444'],['PuntajeD3','d3','#10b981'],['PuntajeD4','d4','#f59e0b']].forEach(([col,id,c])=>{
-      const vs=simI.map(r=>pct(r[col]));
-      const avg=vs.length?Math.round(vs.reduce((a,b)=>a+b,0)/vs.length):0;
-      const fill=document.getElementById(id+'-fill'), val=document.getElementById(id+'-val');
-      if(fill){fill.style.width=avg+'%';fill.style.background=c;}
-      if(val)val.textContent=avg+'%';
+    // Promedio general del grupo agrupado por fecha (igual que BenchPrep por simulacro)
+    const porFecha={};
+    simI.forEach(r=>{
+      const f=String(r['Fecha']||'Sin fecha').split(',')[0].trim();
+      if(!porFecha[f])porFecha[f]=[];
+      porFecha[f].push(pct(r['Puntaje']));
     });
-
-    const tEl=document.getElementById('tabla-sim-infotec');
-    if(tEl){
-      const last=simI.slice(-8).reverse();
-      tEl.innerHTML=`<table class="data-table">
-        <thead><tr><th>Nombre</th><th>Puntaje</th><th>D1</th><th>D2</th><th>D3</th><th>D4</th><th>Tiempo</th><th>Fecha</th></tr></thead>
-        <tbody>${last.map(r=>{const p=pct(r['Puntaje']);return`<tr>
-          <td>${r['Nombre']||''} ${r['Apellido']||''}</td>
-          <td><span class="score-badge ${scoreClass(p)}">${p}%</span></td>
-          <td>${r['PuntajeD1']||'—'}</td><td>${r['PuntajeD2']||'—'}</td>
-          <td>${r['PuntajeD3']||'—'}</td><td>${r['PuntajeD4']||'—'}</td>
-          <td>${r['TiempoMin']?r['TiempoMin']+' min':'—'}</td>
-          <td style="font-family:'JetBrains Mono',monospace;font-size:11px">${String(r['Fecha']||'—').split(',')[0]}</td>
-        </tr>`;}).join('')}</tbody>
-      </table>`;
-    }
+    const labsI=Object.keys(porFecha);
+    const promsI=labsI.map(f=>{const a=porFecha[f];return(a.reduce((x,y)=>x+y,0)/a.length).toFixed(1);});
+    makeBar('chart-sim-infotec',labsI.map(l=>l.length>28?l.substring(0,28)+'…':l),promsI,'#14b8a6','Promedio');
   }
 
   // ── SIMULACROS AWS ──
@@ -464,19 +393,6 @@ function procesarDatos(d){
     simAWS.forEach(r=>{const t=(r['Simulacro']||'Sin tipo').trim();if(!tipos[t])tipos[t]=[];tipos[t].push(pct(r['Puntaje']));});
     const labs=Object.keys(tipos), proms=labs.map(t=>{const a=tipos[t];return(a.reduce((x,y)=>x+y,0)/a.length).toFixed(1);});
     makeBar('chart-simulacros',labs.map(l=>l.length>28?l.substring(0,28)+'…':l),proms,'#f59e0b','Promedio');
-    const tEl=document.getElementById('tabla-simulacros');
-    if(tEl){
-      const last=simAWS.slice(-8).reverse();
-      tEl.innerHTML=`<table class="data-table">
-        <thead><tr><th>Nombre</th><th>Simulacro</th><th>Puntaje</th><th>Fecha</th></tr></thead>
-        <tbody>${last.map(r=>{const p=pct(r['Puntaje']);const sim=(r['Simulacro']||'—').replace('(BenchPrep)','').trim();return`<tr>
-          <td>${r['Nombre']||''} ${r['Apellido']||''}</td>
-          <td>${sim}</td>
-          <td><span class="score-badge ${scoreClass(p)}">${p}</span></td>
-          <td>${String(r['Fecha Realizacion']||r['Fecha Realización']||'—').trim()}</td>
-        </tr>`;}).join('')}</tbody>
-      </table>`;
-    }
   }
 
   // ── DUDAS ──
